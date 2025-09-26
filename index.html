@@ -81,7 +81,18 @@
       padding: 15px;
       background: #2a2a2a;
       border-radius: 10px;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
+    }
+
+    .breakdown {
+      margin-top: 10px;
+      padding: 10px;
+      background: #333;
+      border-radius: 8px;
+    }
+
+    .breakdown p {
+      margin: 5px 0;
     }
 
     /* Responsive tweaks */
@@ -157,14 +168,16 @@
       let roomCost = doubleRooms * roomPrice;
 
       if (leftover === 1) {
-        roomCost += roomPrice; // 1 left → needs another room
+        roomCost += roomPrice; // needs another room
       }
 
-      // Alternative: Use triple occupancy if odd number
+      // Alternative: Triple occupancy check
       if (persons % 3 === 0) {
         let tripleOption = (persons / 3) * (roomPrice + 500);
         roomCost = Math.min(roomCost, tripleOption);
       }
+
+      roomCost *= days;
 
       // --- Meal Calculation ---
       let mealCost = persons * mealPlan * mealPrice * days;
@@ -177,9 +190,15 @@
       let totalCost = roomCost + mealCost + transportCost;
       let perPerson = (totalCost / persons).toFixed(2);
 
+      // --- Breakdown Output ---
       document.getElementById('result').innerHTML =
-        `<b>Total Package Cost:</b> ₹${totalCost}<br>
-         <b>Per Person Cost:</b> ₹${perPerson}`;
+        `<div class="breakdown">
+           <p><b>Room Cost:</b> ₹${roomCost}</p>
+           <p><b>Meal Cost:</b> ₹${mealCost}</p>
+           <p><b>Transport Cost:</b> ₹${transportCost}</p>
+         </div>
+         <p><b>Total Package Cost:</b> ₹${totalCost}</p>
+         <p><b>Per Person Cost:</b> ₹${perPerson}</p>`;
     }
   </script>
 
