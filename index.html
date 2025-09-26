@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Tour Package Calculator - Ayodhya Tourism Services</title>
+  <style>
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      background: #1e1e1e;
+      padding: 15px 20px;
+      border-bottom: 2px solid #d4af37;
+    }
+    header img {
+      height: 50px;
+      margin-right: 15px;
+    }
+    header h1 {
+      font-size: 22px;
+      color: #d4af37;
+      margin: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 30px auto;
+      padding: 20px;
+      background: #1e1e1e;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.6);
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: 500;
+    }
+    input, select, button {
+      width: 100%;
+      margin-top: 6px;
+      padding: 10px;
+      border-radius: 8px;
+      border: none;
+      font-size: 14px;
+    }
+    input, select {
+      background: #2b2b2b;
+      color: #f1f1f1;
+    }
+    button {
+      background: #d4af37;
+      color: black;
+      cursor: pointer;
+      font-weight: bold;
+      margin-top: 20px;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #f1c40f;
+    }
+    #result {
+      margin-top: 25px;
+      padding: 15px;
+      background: #2b2b2b;
+      border-radius: 10px;
+      line-height: 1.6;
+    }
+    .highlight {
+      color: #d4af37;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <!-- Replace logo.png with your actual logo file -->
+    <img src="logo.png" alt="Ayodhya Tourism Logo">
+    <h1>Ayodhya Tourism Services</h1>
+  </header>
+
+  <div class="container">
+    <h2>Tour Package Price Calculator</h2>
+    
+    <label>Average Room Price (Double Occupancy - 2 persons):</label>
+    <input type="number" id="roomPrice" value="2500">
+
+    <label>Extra Person Charge (for Triple Occupancy - 3 persons):</label>
+    <input type="number" id="extraPerson" value="500">
+
+    <label>Car Price per Car per Day:</label>
+    <input type="number" id="carPrice" value="2500">
+
+    <label>Car Capacity (No. of persons per car):</label>
+    <input type="number" id="carCapacity" value="7">
+
+    <label>Meal Price per Person per Meal:</label>
+    <input type="number" id="mealPrice" value="300">
+
+    <label>Meal Plan:</label>
+    <select id="mealPlan">
+      <option value="CP">CP Plan (Breakfast only)</option>
+      <option value="MAP">MAP Plan (Breakfast + Dinner)</option>
+      <option value="AP">AP Plan (Breakfast + Lunch + Dinner)</option>
+    </select>
+
+    <label>Number of Persons:</label>
+    <input type="number" id="persons" value="4">
+
+    <label>Number of Days:</label>
+    <input type="number" id="days" value="1">
+
+    <button onclick="calculatePackage()">Calculate</button>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    function calculatePackage() {
+      let persons = parseInt(document.getElementById("persons").value);
+      let roomPrice = parseInt(document.getElementById("roomPrice").value);
+      let extraPerson = parseInt(document.getElementById("extraPerson").value);
+      let carPrice = parseInt(document.getElementById("carPrice").value);
+      let carCapacity = parseInt(document.getElementById("carCapacity").value);
+      let mealPrice = parseInt(document.getElementById("mealPrice").value);
+      let mealPlan = document.getElementById("mealPlan").value;
+      let days = parseInt(document.getElementById("days").value);
+
+      // Meals per day based on plan
+      let mealsPerDay = (mealPlan === "CP") ? 1 : (mealPlan === "MAP") ? 2 : 3;
+
+      // -------- ROOM ALLOCATION (Least Cost Combination) --------
+      let minRoomCost = Infinity;
+      let bestCombo = {doubles: 0, triples: 0};
+
+      for (let triples = 0; triples <= Math.floor(persons / 3); triples++) {
+        let remaining = persons - (triples * 3);
+        let doubles = Math.ceil(remaining / 2);
+
+        let cost = (triples * (roomPrice + extraPerson)) + (doubles * roomPrice);
+        if (cost < minRoomCost) {
+          minRoomCost = cost;
+          bestCombo = {doubles, triples};
+        }
+      }
+
+      // Meals cost
+      let mealCost = persons * mealPrice * mealsPerDay * days;
+
+      // Transport cost
+      let carCount = Math.ceil(persons / carCapacity);
+      let transportCost = carCount * carPrice * days;
+
+      // Total
+      let total = (minRoomCost * days) + mealCost + transportCost;
+      let perPerson = total / persons;
+
+      // Result
+      document.getElementById("result").innerHTML =
+        `<div>Total Package Cost: <span class="highlight">₹${total}</span></div>
+         <div>Per Person Cost: <span class="highlight">₹${perPerson.toFixed(2)}</span></div>
+         <div>Room Allocation: <span class="highlight">${bestCombo.triples} Triple Room(s), ${bestCombo.doubles} Double Room(s)</span></div>
+         <div>Cars Required: <span class="highlight">${carCount}</span></div>
+         <br>
+         <div><u>Cost Breakdown:</u></div>
+         <div>Rooms: <span class="highlight">₹${minRoomCost * days}</span></div>
+         <div>Meals: <span class="highlight">₹${mealCost}</span></div>
+         <div>Transport: <span class="highlight">₹${transportCost}</span></div>`;
+    }
+  </script>
+</body>
+</html>
